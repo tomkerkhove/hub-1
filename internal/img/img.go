@@ -3,8 +3,13 @@ package img
 import (
 	"bytes"
 	"context"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+	"strings"
 
 	"github.com/disintegration/imaging"
+	"github.com/vincent-petithory/dataurl"
 )
 
 // Store describes the methods an image.Store implementation must provide.
@@ -58,4 +63,28 @@ func GenerateImageVersions(data []byte) ([]*ImageVersion, error) {
 	}
 
 	return imgVersions, nil
+}
+
+// Download is a helper function used to download the image located in the url
+// provided. If it's a data url the image is extracted from it.
+func Download(u string) ([]byte, error) {
+	// Image in data url
+	if strings.HasPrefix(u, "data:") {
+		dataURL, err := dataurl.DecodeString(u)
+		if err != nil {
+			return nil, err
+		}
+		return dataURL.Data, nil
+	}
+
+	// Download image using url provided
+	resp, err := http.Get(u) // #nosec
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode == http.StatusOK {
+		return ioutil.ReadAll(resp.Body)
+	}
+	return nil, fmt.Errorf("unexpected status code received: %d", resp.StatusCode)
 }
