@@ -43,6 +43,7 @@ export interface Package {
   appVersion: string;
   repository: Repository;
   readme?: string | null;
+  install?: string | null;
   data?: PackageData | null;
   availableVersions?: Version[];
   version?: string;
@@ -88,7 +89,7 @@ export interface CustomResourcesDefinition {
 }
 
 export interface PackageData {
-  policies?: { raw: string }[];
+  policies?: string;
   rules?: { raw: string }[];
   capabilities?: string;
   customResourcesDefinitionsExamples?: string;

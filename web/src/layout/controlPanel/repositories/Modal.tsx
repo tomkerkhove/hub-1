@@ -233,16 +233,21 @@ const RepositoryModal = (props: Props) => {
             </p>
           </small>
         );
+      case RepositoryKind.OPA:
+        return (
+          <small className="text-muted text-break mt-1">
+            <p>URL where the OPA policies are located. At the moment only Github and Gitlab URLs are supported.</p>
+          </small>
+        );
     }
   };
 
   const getURLPattern = (): string | undefined => {
     switch (selectedKind) {
-      case RepositoryKind.OLM:
-      case RepositoryKind.Falco:
-        return '(https://(github|gitlab).com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)/?(.*)';
-      default:
+      case RepositoryKind.Helm:
         return undefined;
+      default:
+        return '(https://(github|gitlab).com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)/?(.*)';
     }
   };
 
@@ -277,7 +282,7 @@ const RepositoryModal = (props: Props) => {
       error={apiError}
       cleanError={cleanApiError}
     >
-      <div className="w-100">
+      <div className={`w-100 ${styles.body}`}>
         <form
           data-testid="repoForm"
           ref={form}

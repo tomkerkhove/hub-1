@@ -1521,6 +1521,10 @@ components:
           type: string
           nullable: true
           example: "###Readme"
+        install:
+          type: string
+          nullable: true
+          example: "Installation"
         links:
           type: array
           items:
@@ -1625,11 +1629,8 @@ components:
                   type: string
                   example: "- macro: text\n  condition: (evt.num < 0)\n\n"
             policies:
-              type: object
-              properties:
-                Raw:
-                  type: string
-                  example: "- macro: text\n  condition: (evt.num < 0)\n\n"
+              type: string
+              example: "- macro: text\n  condition: (evt.num < 0)\n\n"
           nullable: true
     RepositoryKind:
       type: integer
