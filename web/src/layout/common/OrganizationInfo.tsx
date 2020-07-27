@@ -47,15 +47,24 @@ const OrganizationInfo = (props: Props) => {
   };
 
   useEffect(() => {
+    let timeout: NodeJS.Timeout;
     if (!isUndefined(organization) && !openStatus && (onLinkHover || onDropdownHover)) {
-      setOpenStatus(true);
+      timeout = setTimeout(() => {
+        setOpenStatus(true);
+      }, 500);
     }
     if (openStatus && !onLinkHover && !onDropdownHover) {
-      setTimeout(() => {
+      timeout = setTimeout(() => {
         // Delay to hide the dropdown to avoid hide it if user changes from link to dropdown
         setOpenStatus(false);
       }, 50);
     }
+
+    return () => {
+      if (!isUndefined(timeout)) {
+        clearTimeout(timeout);
+      }
+    };
   }, [onLinkHover, onDropdownHover, organization, openStatus]);
 
   return (

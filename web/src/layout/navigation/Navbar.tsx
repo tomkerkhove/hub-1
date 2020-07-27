@@ -12,6 +12,7 @@ import MobileSettings from './MobileSettings';
 import styles from './Navbar.module.css';
 import SignUp from './SignUp';
 import UserAuthDropdown from './UserAuthDropdown';
+import DarkMode from './DarkMode';
 
 interface Props {
   isSearching: boolean;
@@ -105,6 +106,10 @@ const Navbar = (props: Props) => {
                       >
                         Sign in
                       </button>
+                    </li>
+
+                    <li className="nav-item ml-4 position-relative">
+                      <DarkMode darkVersion />
                     </li>
                   </>
                 ) : (

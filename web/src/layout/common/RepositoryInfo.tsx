@@ -28,15 +28,23 @@ const RepositoryInfo = (props: Props) => {
   useOutsideClick([ref], openStatus, () => setOpenStatus(false));
 
   useEffect(() => {
+    let timeout: NodeJS.Timeout;
     if (!openStatus && (onLinkHover || onDropdownHover)) {
-      setOpenStatus(true);
+      timeout = setTimeout(() => {
+        setOpenStatus(true);
+      }, 500);
     }
     if (openStatus && !onLinkHover && !onDropdownHover) {
-      setTimeout(() => {
+      timeout = setTimeout(() => {
         // Delay to hide the dropdown to avoid hide it if user changes from link to dropdown
         setOpenStatus(false);
       }, 50);
     }
+    return () => {
+      if (!isUndefined(timeout)) {
+        clearTimeout(timeout);
+      }
+    };
   }, [onLinkHover, onDropdownHover, openStatus]);
 
   return (

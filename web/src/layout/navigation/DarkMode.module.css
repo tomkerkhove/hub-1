@@ -1,0 +1,26 @@
+.switch {
+  font-size: 1.15rem;
+}
+
+.switch svg {
+  margin-top: -5px;
+}
+
+.darkSwitch {
+  color: var(--color-white) !important;
+}
+
+.darkSwitch .checkbox ~ .label::before {
+  background-color: var(--color-black-5) !important;
+}
+
+.darkSwitch .checkbox:checked ~ .label::before {
+  background-color: var(--color-1-900) !important;
+  border-color: var(--color-white) !important;
+  color: var(--color-white) !important;
+}
+
+.checkbox,
+.checkbox + label {
+  cursor: pointer;
+}

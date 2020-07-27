@@ -10,6 +10,7 @@ import useOutsideClick from '../../hooks/useOutsideClick';
 import Image from '../common/Image';
 import LogOut from './LogOut';
 import styles from './UserAuthDropdown.module.css';
+import DarkMode from './DarkMode';
 
 interface Props {
   privateRoute?: boolean;
@@ -85,6 +86,10 @@ const UserAuthDropdown = (props: Props) => {
             <div>Control Panel</div>
           </div>
         </Link>
+
+        <div className="dropdown-item">
+          <DarkMode />
+        </div>
 
         <LogOut className="mb-2" onSuccess={() => setOpenStatus(false)} privateRoute={props.privateRoute} />
       </div>

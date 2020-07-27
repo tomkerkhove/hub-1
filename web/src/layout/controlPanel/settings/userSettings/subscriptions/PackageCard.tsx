@@ -23,7 +23,7 @@ const PackageCard = (props: Props) => {
           <div className={`card-body position-relative ${styles.body}`}>
             <Link
               data-testid="packageCardLink"
-              className={`text-decoration-none ${styles.link}`}
+              className={`text-decoration-none text-reset ${styles.link}`}
               to={{
                 pathname: buildPackageURL(props.package),
               }}
