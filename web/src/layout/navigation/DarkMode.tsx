@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useContext } from 'react';
 import classnames from 'classnames';
+import { isUndefined } from 'lodash';
+import React, { useContext, useEffect, useState } from 'react';
+import { IoIosMoon } from 'react-icons/io';
 
 import { AppCtx, updateTheme } from '../../context/AppCtx';
 import styles from './DarkMode.module.css';
-import { IoIosMoon } from 'react-icons/io';
-import { isUndefined } from 'lodash';
 
 interface Props {
   darkVersion?: boolean;
@@ -21,7 +21,7 @@ const DarkMode = (props: Props) => {
     let theme = active ? 'darkTheme' : DEFAULT_THEME; // TODO
     document.documentElement.setAttribute('data-theme', theme);
     dispatch(updateTheme(theme));
-  }, [active]);
+  }, [active, dispatch]);
 
   return (
     <div>

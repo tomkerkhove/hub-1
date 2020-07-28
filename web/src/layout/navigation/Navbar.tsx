@@ -7,12 +7,12 @@ import { Link } from 'react-router-dom';
 
 import { AppCtx } from '../../context/AppCtx';
 import SearchBar from '../common/SearchBar';
+import DarkMode from './DarkMode';
 import LogIn from './LogIn';
 import MobileSettings from './MobileSettings';
 import styles from './Navbar.module.css';
 import SignUp from './SignUp';
 import UserAuthDropdown from './UserAuthDropdown';
-import DarkMode from './DarkMode';
 
 interface Props {
   isSearching: boolean;

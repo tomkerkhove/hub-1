@@ -8,9 +8,9 @@ import { Link } from 'react-router-dom';
 import { AppCtx } from '../../context/AppCtx';
 import useOutsideClick from '../../hooks/useOutsideClick';
 import Image from '../common/Image';
+import DarkMode from './DarkMode';
 import LogOut from './LogOut';
 import styles from './UserAuthDropdown.module.css';
-import DarkMode from './DarkMode';
 
 interface Props {
   privateRoute?: boolean;

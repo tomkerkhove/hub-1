@@ -1,46 +1,72 @@
 html[data-theme='darkTheme'] {
   $theme-colors: (
-    primary: #616161,
-    secondary: #757575,
+    primary: #101c29,
+    secondary: #465768,
   );
 
-  $body-bg: #212121;
-  $body-color: #f9f9f9;
+  $body-bg: #1b1c1d;
+  $body-color: #d3d4d4;
 
   --border-md: #eaecef;
   --code-bg-md: #f6f8fa;
-  --body-light-bg: #212121;
+  --body-light-bg: #020304;
 
-  --color-1-100: #212121;
-  --color-1-300: #424242;
-  --color-1-500: #616161;
-  --color-1-700: #757575;
-  --color-1-900: #9e9e9e;
+  --color-1-100: #020304;
+  --color-1-300: #090f17;
+  --color-1-500: #101c29;
+  --color-1-700: #465768;
+  --color-1-900: #8c96a1;
 
-  --color-1-2: rgba(28, 44, 53, 0.02);
-  --color-1-5: rgba(28, 44, 53, 0.05);
-  --color-1-10: rgba(28, 44, 53, 0.1);
-  --color-1-20: rgba(28, 44, 53, 0.2);
+  --color-1-2: rgba(2, 3, 4, 0.02);
+  --color-1-5: rgba(2, 3, 4, 0.05);
+  --color-1-10: rgba(2, 3, 4, 0.1);
+  --color-1-20: rgba(2, 3, 4, 0.2);
 
-  --color-2-500: #b0cee0;
+  --color-2-500: #192e43;
 
-  --color-2-10: rgba(176, 206, 224, 0.1);
+  --color-2-10: rgba(137, 66, 96, 0.1);
 
-  --color-3-10: rgba(101, 157, 189, 0.1);
+  --color-3-10: rgba(23, 41, 59, 0.1);
 
-  --color-black-5: rgba(0, 0, 0, 0.05);
-  --color-black-15: rgba(0, 0, 0, 0.15);
-  --color-black-25: rgba(0, 0, 0, 0.25);
+  --color-black-5: rgba(256, 256, 256, 0.05);
+  --color-black-15: rgba(256, 256, 256, 0.15);
+  --color-black-25: rgba(256, 256, 256, 0.25);
 
-  --color-white-50: rgba(256, 256, 256, 0.5);
+  --color-white-50: rgba(0, 0, 0, 0.5);
 
   --logo-font: 'Archivo Black', cursive;
 
-  --white: $gray-800;
-  --black: $gray-100;
+  --white: #1c1e20;
+  --black: var(--color-1-100);
 
-  --color-font: #f9f9f9;
-  --body-bg: #212121;
+  --color-font: #d3d4d4;
+  --body-bg: #1b1c1d;
 
   @import '~bootstrap/scss/bootstrap.scss';
+
+  .text-muted {
+    color: #d2d4d7 !important;
+  }
+
+  .text-primary {
+    color: #f0f1f3 !important;
+  }
+
+  .text-secondary {
+    color: #d3d4d4;
+  }
+
+  .dropdown-menu {
+    background-color: var(--color-1-100);
+    color: #d3d4d4;
+  }
+
+  .dropdown-item,
+  .jumbotron {
+    color: #d3d4d4;
+  }
+
+  .dropdown-menu .arrow::after {
+    border-bottom-color: var(--color-1-100);
+  }
 }
