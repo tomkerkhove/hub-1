@@ -4,6 +4,7 @@ import { tomorrowNightBright } from 'react-syntax-highlighter/dist/cjs/styles/hl
 
 import { OPAPolicies } from '../../types';
 import Accordion from '../common/Accordion';
+import ButtonCopyToClipboard from '../common/ButtonCopyToClipboard';
 
 interface Props {
   policies: OPAPolicies;
@@ -16,9 +17,14 @@ const OPAPoliciesList = (props: Props) => {
       {Object.keys(props.policies).map((policy: string, index: number) => {
         return (
           <Accordion key={`policy_${index}`} title={policy} isOpen={policy === isOpen} setOpenStatus={setOpen}>
-            <SyntaxHighlighter language="rego" style={tomorrowNightBright} customStyle={{ padding: '1.5rem' }}>
-              {props.policies[policy]}
-            </SyntaxHighlighter>
+            <>
+              <div className="mb-2 text-right">
+                <ButtonCopyToClipboard text={props.policies[policy]} />
+              </div>
+              <SyntaxHighlighter language="rego" style={tomorrowNightBright} customStyle={{ padding: '1.5rem' }}>
+                {props.policies[policy]}
+              </SyntaxHighlighter>
+            </>
           </Accordion>
         );
       })}
