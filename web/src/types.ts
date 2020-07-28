@@ -89,12 +89,16 @@ export interface CustomResourcesDefinition {
 }
 
 export interface PackageData {
-  policies?: string;
+  policies?: OPAPolicies;
   rules?: { raw: string }[];
   capabilities?: string;
   customResourcesDefinitionsExamples?: string;
   customResourcesDefinitions?: CustomResourcesDefinition[];
   isGlobalOperator?: boolean;
+}
+
+export interface OPAPolicies {
+  [key: string]: string;
 }
 
 export interface SearchFiltersURL {

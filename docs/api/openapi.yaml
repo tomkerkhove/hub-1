@@ -1629,8 +1629,11 @@ components:
                   type: string
                   example: "- macro: text\n  condition: (evt.num < 0)\n\n"
             policies:
-              type: string
-              example: "- macro: text\n  condition: (evt.num < 0)\n\n"
+              type: object
+              additionalProperties:
+                type: string
+              example:
+                policy1: "- macro: text\n  condition: (evt.num < 0)\n\n"
           nullable: true
     RepositoryKind:
       type: integer
