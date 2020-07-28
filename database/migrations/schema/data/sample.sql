@@ -11,7 +11,3 @@ insert into repository (name, url, repository_kind_id, user_id)
 values ('incubator','https://kubernetes-charts-incubator.storage.googleapis.com', 0, '00000000-0000-0000-0000-000000000001');
 insert into repository (name, url, repository_kind_id, user_id)
 values ('community-operators','https://github.com/operator-framework/community-operators/upstream-community-operators', 3, '00000000-0000-0000-0000-000000000001');
-insert into repository (name, url, repository_kind_id, user_id)
-values ('deprek8ion','https://github.com/tegioz/deprek8ion/policies', 2, '00000000-0000-0000-0000-000000000001');
-insert into repository (name, url, repository_kind_id, user_id)
-values ('redhat-cop','https://github.com/tegioz/rego-policies/policy', 2, '00000000-0000-0000-0000-000000000001');
