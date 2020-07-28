@@ -28,7 +28,8 @@ type Action =
   | { type: 'unselectOrg' }
   | { type: 'updateUser'; user: UserFullName }
   | { type: 'updateOrg'; name: string }
-  | { type: 'updateLimit'; limit: number };
+  | { type: 'updateLimit'; limit: number }
+  | { type: 'updateTheme'; theme?: string };
 
 export const AppCtx = createContext<{
   ctx: AppState;
@@ -56,6 +57,10 @@ export function updateUser(user: UserFullName) {
 
 export function updateLimit(limit: number) {
   return { type: 'updateLimit', limit };
+}
+
+export function updateTheme(theme?: string) {
+  return { type: 'updateTheme', theme };
 }
 
 export async function refreshUserProfile(dispatch: React.Dispatch<any>, redirectUrl?: string) {
@@ -129,6 +134,19 @@ export function appReducer(state: AppState, action: Action) {
       return {
         ...state,
         prefs: updatedPrefs,
+      };
+    case 'updateTheme':
+      const updatedUserPrefs = {
+        ...state.prefs,
+        theme: action.theme,
+      };
+      lsStorage.setPrefs(
+        updatedUserPrefs,
+        !isNull(state.user) && !isUndefined(state.user) ? state.user.alias : undefined
+      );
+      return {
+        ...state,
+        prefs: updatedUserPrefs,
       };
     case 'updateUser':
       lsStorage.updateAlias(state.user!.alias, action.user.alias);

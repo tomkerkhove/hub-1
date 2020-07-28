@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import classnames from 'classnames';
 
+import { AppCtx, updateTheme } from '../../context/AppCtx';
 import styles from './DarkMode.module.css';
 import { IoIosMoon } from 'react-icons/io';
 import { isUndefined } from 'lodash';
@@ -12,42 +13,15 @@ interface Props {
 const DEFAULT_THEME = 'theme';
 
 const DarkMode = (props: Props) => {
-  const [active, setActive] = useState<boolean>(false);
-  const [activeTheme, setActiveTheme] = useState<string>(DEFAULT_THEME);
-
-  const switchTheme = (newTheme: string) => {
-    const dom = document.getElementById(`atifactHubStyle-${activeTheme}`);
-    if (dom) {
-      dom.remove();
-    }
-
-    const themeAssetId = `atifactHubStyle-${newTheme}`;
-    if (!document.getElementById(themeAssetId)) {
-      const style = document.createElement('link');
-      style.type = 'text/css';
-      style.rel = 'stylesheet';
-      style.id = `atifactHubStyle-${newTheme}`;
-      style.href = `../../themes/${newTheme}.scss`;
-      document.body.append(style);
-      document.body.setAttribute('data-theme', newTheme);
-      setActiveTheme(newTheme);
-    }
-  };
+  const { ctx, dispatch } = useContext(AppCtx);
+  const activeTheme = ctx.prefs.theme || DEFAULT_THEME;
+  const [active, setActive] = useState<boolean>(activeTheme === 'darkTheme');
 
   useEffect(() => {
-    let theme = active ? 'darkTheme' : DEFAULT_THEME;
+    let theme = active ? 'darkTheme' : DEFAULT_THEME; // TODO
     document.documentElement.setAttribute('data-theme', theme);
-
-    // import(`../../themes/${theme}.scss`).then(() => {
-    //   console.log('entro import', theme);
-    //   return;
-    // });
-    // switchTheme(theme);
+    dispatch(updateTheme(theme));
   }, [active]);
-
-  // import(`../styles/darkTheme.scss`).then(() => {
-  //   return;
-  // });
 
   return (
     <div>
