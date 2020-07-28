@@ -23,7 +23,6 @@ func PreparePackageFromMetadata(md *hub.PackageMetadata) (*hub.Package, error) {
 	}
 	p := &hub.Package{
 		Name:           md.Name,
-		LogoURL:        md.LogoURL,
 		IsOperator:     md.Operator,
 		DisplayName:    md.DisplayName,
 		Description:    md.Description,
@@ -38,8 +37,10 @@ func PreparePackageFromMetadata(md *hub.PackageMetadata) (*hub.Package, error) {
 		Deprecated:     md.Deprecated,
 		License:        md.License,
 		ContainerImage: md.ContainerImage,
-		Provider:       md.Provider.Name,
 		Maintainers:    md.Maintainers,
+	}
+	if md.Provider != nil {
+		p.Provider = md.Provider.Name
 	}
 	createdAt, _ := time.Parse(time.RFC3339, md.CreatedAt)
 	p.CreatedAt = createdAt.Unix()

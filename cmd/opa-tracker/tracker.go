@@ -8,11 +8,9 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"sort"
 	"strings"
 	"sync"
 
-	"github.com/Masterminds/semver/v3"
 	"github.com/artifacthub/hub/internal/hub"
 	"github.com/artifacthub/hub/internal/img"
 	"github.com/artifacthub/hub/internal/pkg"
@@ -90,83 +88,63 @@ func (t *Tracker) Track(wg *sync.WaitGroup) error {
 	bypassDigestCheck := t.cfg.GetBool("tracker.bypassDigestCheck")
 	packagesAvailable := make(map[string]struct{})
 	basePath := filepath.Join(tmpDir, packagesPath)
-	packages, err := ioutil.ReadDir(basePath)
-	if err != nil {
-		return fmt.Errorf("error reading packages: %w", err)
-	}
-	for _, p := range packages {
-		if !p.IsDir() {
-			continue
-		}
-		pName := p.Name()
-		pPath := filepath.Join(basePath, pName)
-
-		// Get package versions available
-		versionsUnfiltered, err := ioutil.ReadDir(pPath)
+	err = filepath.Walk(basePath, func(pkgPath string, info os.FileInfo, err error) error {
 		if err != nil {
-			t.Warn(fmt.Errorf("error reading package %s versions: %w", pName, err))
-			continue
+			return fmt.Errorf("error reading packages: %w", err)
 		}
-		var versions []string
-		for _, entryV := range versionsUnfiltered {
-			if !entryV.IsDir() {
-				continue
-			}
-			pVersion := entryV.Name()
-			if _, err := semver.StrictNewVersion(pVersion); err != nil {
-				t.Warn(fmt.Errorf("invalid package %s version (%s): %w", pName, pVersion, err))
-				continue
-			} else {
-				versions = append(versions, pVersion)
-			}
+		if !info.IsDir() {
+			return nil
 		}
-		sort.Slice(versions, func(i, j int) bool {
-			vi, _ := semver.NewVersion(versions[i])
-			vj, _ := semver.NewVersion(versions[j])
-			return vj.LessThan(vi)
-		})
 
-		// Process package versions available
-		for i, pVersion := range versions {
-			select {
-			case <-t.ctx.Done():
-				return nil
-			default:
-			}
+		// Check if context has been cancelled
+		select {
+		case <-t.ctx.Done():
+			return nil
+		default:
+		}
 
-			// Read and parse package version metadata
-			pvPath := filepath.Join(pPath, pVersion)
-			data, err := ioutil.ReadFile(filepath.Join(pvPath, "artifacthub.yaml"))
+		// Read and parse package version metadata
+		data, err := ioutil.ReadFile(filepath.Join(pkgPath, "artifacthub.yaml"))
+		if err != nil {
+			return nil
+		}
+		var md *hub.PackageMetadata
+		if err = yaml.Unmarshal(data, &md); err != nil || md == nil {
+			t.Warn(fmt.Errorf("error unmarshaling package version metadata file %s: %w", pkgPath, err))
+			return nil
+		}
+
+		// Check if this package version is already registered
+		key := fmt.Sprintf("%s@%s", md.Name, md.Version)
+		packagesAvailable[key] = struct{}{}
+		if _, ok := packagesRegistered[key]; ok && !bypassDigestCheck {
+			return nil
+		}
+
+		// Read logo image when available
+		var logoImageID string
+		if md.LogoPath != "" {
+			data, err := ioutil.ReadFile(filepath.Join(pkgPath, md.LogoPath))
 			if err != nil {
-				t.Warn(fmt.Errorf("error reading package version metadata file %s: %w", pvPath, err))
-				return nil
+				return fmt.Errorf("error reading package %s version %s logo: %w", md.Name, md.Version, err)
 			}
-			var md *hub.PackageMetadata
-			if err = yaml.Unmarshal(data, &md); err != nil || md == nil {
-				t.Warn(fmt.Errorf("error unmarshaling package version metadata file %s: %w", pvPath, err))
-				return nil
-			}
-			pName := md.Name
-			pVersion := md.Version
-
-			// Check if this package version is already registered
-			key := fmt.Sprintf("%s@%s", pName, pVersion)
-			packagesAvailable[key] = struct{}{}
-			if _, ok := packagesRegistered[key]; ok && !bypassDigestCheck {
-				continue
-			}
-
-			// Register package version
-			t.Logger.Debug().Str("name", pName).Str("v", pVersion).Msg("registering package version")
-			var storeLogo bool
-			if i == 0 {
-				storeLogo = true
-			}
-			err = t.registerPackage(pvPath, md, storeLogo)
-			if err != nil {
-				t.Warn(fmt.Errorf("error registering package %s version %s: %w", pName, pVersion, err))
+			logoImageID, err = t.is.SaveImage(t.ctx, data)
+			if err != nil && !errors.Is(err, image.ErrFormat) {
+				return fmt.Errorf("error saving package %s version %s logo: %w", md.Name, md.Version, err)
 			}
 		}
+
+		// Register package version
+		t.Logger.Debug().Str("name", md.Name).Str("v", md.Version).Msg("registering package")
+		err = t.registerPackage(pkgPath, md, logoImageID)
+		if err != nil {
+			t.Warn(fmt.Errorf("error registering package %s version %s: %w", md.Name, md.Version, err))
+		}
+
+		return nil
+	})
+	if err != nil {
+		return err
 	}
 
 	// Unregister packages not available anymore
@@ -178,11 +156,11 @@ func (t *Tracker) Track(wg *sync.WaitGroup) error {
 		}
 		if _, ok := packagesAvailable[key]; !ok {
 			p := strings.Split(key, "@")
-			pName := p[0]
-			pVersion := p[1]
-			t.Logger.Debug().Str("name", pName).Str("v", pVersion).Msg("unregistering package")
-			if err := t.unregisterPackage(pName, pVersion); err != nil {
-				t.Warn(fmt.Errorf("error unregistering package %s version %s: %w", pName, pVersion, err))
+			name := p[0]
+			version := p[1]
+			t.Logger.Debug().Str("name", name).Str("v", version).Msg("unregistering package")
+			if err := t.unregisterPackage(name, version); err != nil {
+				t.Warn(fmt.Errorf("error unregistering package %s version %s: %w", name, version, err))
 			}
 		}
 	}
@@ -199,52 +177,39 @@ func (t *Tracker) Warn(err error) {
 
 // registerPackage registers a package version using the package metadata
 // provided.
-func (t *Tracker) registerPackage(pvPath string, md *hub.PackageMetadata, storeLogo bool) error {
+func (t *Tracker) registerPackage(pkgPath string, md *hub.PackageMetadata, logoImageID string) error {
 	// Prepare package from metadata
 	p, err := pkg.PreparePackageFromMetadata(md)
 	if err != nil {
 		return fmt.Errorf("error preparing package %s version %s from metadata: %w", md.Name, md.Version, err)
 	}
+	p.LogoImageID = logoImageID
+	p.Repository = t.r
 
-	// Prepare source link
-	var repoBaseURL, pkgsPath, provider string
-	matches := repo.GitRepoURLRE.FindStringSubmatch(t.r.URL)
-	if len(matches) >= 3 {
-		repoBaseURL = matches[1]
-		provider = matches[2]
-	}
-	if len(matches) == 4 {
-		pkgsPath = strings.TrimSuffix(matches[3], "/")
-	}
-	var blobPath string
-	switch provider {
-	case "github":
-		blobPath = "blob/master"
-	case "gitlab":
-		blobPath = "-/blob/master"
-	}
-	p.Links = append(p.Links, &hub.Link{
-		Name: "source",
-		URL:  fmt.Sprintf("%s/%s/%s%s", repoBaseURL, blobPath, pkgsPath, pvPath),
-	})
-
-	// Read policies file and add it to the package data field
-	policies, err := ioutil.ReadFile(filepath.Join(pvPath, "policies.rego"))
-	if err != nil {
-		return fmt.Errorf("error reading package version policies file %s: %w", pvPath, err)
-	}
-	p.Data["policies"] = policies
-
-	// Download logo image if needed and add its logo to the package
-	if storeLogo && md.LogoURL != "" {
-		data, err := img.Download(md.LogoURL)
+	// Read policies files and add them to the package data field
+	policies := make(map[string]string)
+	err = filepath.Walk(pkgPath, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
-			return fmt.Errorf("error downloading package %s version %s image: %w", md.Name, md.Version, err)
+			return fmt.Errorf("error reading policy files: %w", err)
 		}
-		p.LogoImageID, err = t.is.SaveImage(t.ctx, data)
-		if err != nil && !errors.Is(err, image.ErrFormat) {
-			return fmt.Errorf("error saving package %s version %s image: %w", md.Name, md.Version, err)
+		if info.IsDir() {
+			return nil
 		}
+		if !strings.HasSuffix(info.Name(), ".rego") {
+			return nil
+		}
+		policy, err := ioutil.ReadFile(path)
+		if err != nil {
+			return fmt.Errorf("error reading policy for package %s version %s: %w", md.Name, md.Version, err)
+		}
+		policies[strings.TrimPrefix(path, pkgPath)] = string(policy)
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+	p.Data = map[string]interface{}{
+		"policies": policies,
 	}
 
 	// Register package

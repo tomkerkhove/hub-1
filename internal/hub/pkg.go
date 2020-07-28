@@ -21,7 +21,7 @@ type GetPackageInput struct {
 // Link represents a url associated with a package.
 type Link struct {
 	Name string `json:"name" yaml:"name"`
-	URL  string `json:"url" yaml:"name"`
+	URL  string `json:"url" yaml:"url"`
 }
 
 // Maintainer represents a package's maintainer.
@@ -88,7 +88,7 @@ type PackageMetadata struct {
 	DisplayName    string        `yaml:"displayName"`
 	CreatedAt      string        `yaml:"createdAt"`
 	Description    string        `yaml:"description"`
-	LogoURL        string        `yaml:"logoURL"`
+	LogoPath       string        `yaml:"logoPath"`
 	Digest         string        `yaml:"digest"`
 	License        string        `yaml:"license"`
 	HomeURL        string        `yaml:"homeURL"`

@@ -27,7 +27,6 @@ func TestPreparePackageFromMetadata(t *testing.T) {
 				DisplayName:    "Package 1",
 				CreatedAt:      "2006-01-02T15:04:05Z",
 				Description:    "Package description",
-				LogoURL:        "https://logo1.url",
 				Digest:         "0123456789",
 				License:        "Apache-2.0",
 				HomeURL:        "https://home.url",
@@ -60,7 +59,6 @@ func TestPreparePackageFromMetadata(t *testing.T) {
 			},
 			&hub.Package{
 				Name:        "pkg1",
-				LogoURL:     "https://logo1.url",
 				IsOperator:  false,
 				DisplayName: "Package 1",
 				Description: "Package description",
